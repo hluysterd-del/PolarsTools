@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colors — PolarsTools</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+  <nav class="nav-bar">
+    <div class="container">
+      <a href="../index.html" class="nav-logo">PolarsTools</a>
+      <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle navigation">&#9776;</button>
+      <ul class="nav-links">
+        <li><a href="downloader.html">Downloader</a></li>
+        <li><a href="browser.html">Browser</a></li>
+        <li><a href="stats.html">Stats</a></li>
+        <li><a href="userlookup.html">User Lookup</a></li>
+        <li><a href="editor.html">Editor</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <div class="container">
+      <h1>Colors</h1>
+      <p class="page-subtitle">Pick and preview GRAB material colors and palettes.</p>
+      <div id="tool-content"></div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">PolarsTools &mdash; Not affiliated with GRAB or Slin</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/protobufjs@7/dist/protobuf.min.js"></script>
+  <script src="../js/proto.js"></script>
+  <script src="../js/api.js"></script>
+</body>
+</html>

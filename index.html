@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PolarsTools — Free Tools for GRAB VR</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Nav Bar -->
+  <nav class="nav-bar">
+    <div class="container">
+      <a href="index.html" class="nav-logo">PolarsTools</a>
+      <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle navigation">&#9776;</button>
+      <ul class="nav-links">
+        <li><a href="pages/downloader.html">Downloader</a></li>
+        <li><a href="pages/browser.html">Browser</a></li>
+        <li><a href="pages/stats.html">Stats</a></li>
+        <li><a href="pages/userlookup.html">User Lookup</a></li>
+        <li><a href="pages/editor.html">Editor</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <h1>PolarsTools</h1>
+      <p class="subtitle">Free Tools for GRAB VR</p>
+      <p class="description">
+        A collection of community-built utilities for GRAB players and creators.
+        Download levels, browse creations, analyze stats, convert images, and more.
+      </p>
+    </div>
+  </section>
+
+  <!-- Tool Cards -->
+  <section class="container">
+    <div class="card-grid">
+
+      <div class="tool-card">
+        <span class="card-icon">&#x1F53D;</span>
+        <h3>Downloader</h3>
+        <p>Download any GRAB level as a protobuf file by pasting a level link or identifier.</p>
+        <a href="pages/downloader.html" class="card-link">Open tool</a>
+      </div>
+
+      <div class="tool-card">
+        <span class="card-icon">&#x1F50D;</span>
+        <h3>Browser</h3>
+        <p>Browse and search through the full catalogue of published GRAB levels.</p>
+        <a href="pages/browser.html" class="card-link">Open tool</a>
+      </div>
+
+      <div class="tool-card">
+        <span class="card-icon">&#x1F5BC;</span>
+        <h3>Image2Grab</h3>
+        <p>Convert any image into a GRAB level made of colored blocks — pixel art in VR.</p>
+        <a href="pages/image2grab.html" class="card-link">Open tool</a>
+      </div>
+
+      <div class="tool-card">
+        <span class="card-icon">&#x1F3A8;</span>
+        <h3>Colors</h3>
+        <p>Pick and preview GRAB material colors, generate palettes, and copy values.</p>
+        <a href="pages/colors.html" class="card-link">Open tool</a>
+      </div>
+
+      <div class="tool-card">
+        <span class="card-icon">&#x1F4CA;</span>
+        <h3>Stats</h3>
+        <p>View detailed statistics for any GRAB level — plays, likes, completions, and more.</p>
+        <a href="pages/stats.html" class="card-link">Open tool</a>
+      </div>
+
+      <div class="tool-card">
+        <span class="card-icon">&#x1F464;</span>
+        <h3>User Lookup</h3>
+        <p>Search for GRAB players by name and explore all of their published levels.</p>
+        <a href="pages/userlookup.html" class="card-link">Open tool</a>
+      </div>
+
+      <div class="tool-card">
+        <span class="card-icon">&#x270F;</span>
+        <h3>Editor</h3>
+        <p>Inspect and edit GRAB level files in the browser — modify nodes, properties, and more.</p>
+        <a href="pages/editor.html" class="card-link">Open tool</a>
+      </div>
+
+      <div class="tool-card">
+        <span class="card-icon">&#x1F517;</span>
+        <h3>Merger</h3>
+        <p>Combine multiple GRAB levels into one by merging their node trees together.</p>
+        <a href="pages/merger.html" class="card-link">Open tool</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      PolarsTools &mdash; Not affiliated with GRAB or Slin
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/protobufjs@7/dist/protobuf.min.js"></script>
+  <script src="js/proto.js"></script>
+  <script src="js/api.js"></script>
+
+</body>
+</html>
