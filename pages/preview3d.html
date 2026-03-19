@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Preview — PolarsTools</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/protection.js"></script>
+  <style>
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 40px 24px;
+      text-align: center;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+      margin-bottom: 16px;
+    }
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(108, 92, 231, 0.06);
+    }
+    .upload-zone .upload-icon {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .upload-zone p {
+      font-size: 0.95rem;
+    }
+    .upload-zone .upload-hint {
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+    .or-divider {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin: 16px 0;
+      position: relative;
+    }
+    .or-divider::before,
+    .or-divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: calc(50% - 24px);
+      height: 1px;
+      background: var(--border);
+    }
+    .or-divider::before { left: 0; }
+    .or-divider::after { right: 0; }
+    .viewport-container {
+      width: 100%;
+      height: 500px;
+      background: #1a1a2e;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-top: 24px;
+      position: relative;
+    }
+    .viewport-container canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .viewport-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+    .viewport-overlay.hidden { display: none; }
+    .controls-info {
+      margin-top: 12px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+    .stats-display {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      margin-top: 12px;
+    }
+    .stats-display .stat-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 20px;
+      text-align: center;
+    }
+    .stats-display .stat-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-heading);
+    }
+    .stats-display .stat-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav-bar">
+    <div class="container">
+      <a href="../index.html" class="nav-logo">PolarsTools</a>
+      <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle navigation">&#9776;</button>
+      <ul class="nav-links">
+        <li><a href="downloader.html">Downloader</a></li>
+        <li><a href="browser.html">Browser</a></li>
+        <li><a href="image2grab.html">Image2Grab</a></li>
+        <li><a href="colors.html">Colors</a></li>
+        <li><a href="stats.html">Stats</a></li>
+        <li><a href="userlookup.html">User Lookup</a></li>
+        <li><a href="editor.html">Editor</a></li>
+        <li><a href="merger.html">Merger</a></li>
+        <li><a href="generator.html">Generator</a></li>
+        <li><a href="preview3d.html" class="active">3D Preview</a></li>
+        <li><a href="converter.html">Converter</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <div class="container">
+      <h1>3D Level Preview</h1>
+      <p class="page-subtitle">View any GRAB level in 3D right in your browser.</p>
+
+      <div id="tool-content">
+        <!-- Upload zone -->
+        <div class="upload-zone" id="upload-zone">
+          <span class="upload-icon">&#x1F4C1;</span>
+          <p>Drag &amp; drop a <strong>.level</strong> file here, or click to browse</p>
+          <p class="upload-hint">Accepts GRAB level protobuf files</p>
+          <input type="file" id="file-input" accept=".level" style="display:none;">
+        </div>
+
+        <div class="or-divider">OR</div>
+
+        <!-- Link input -->
+        <div class="downloader-input-row">
+          <input type="text" id="level-input" placeholder="Paste GRAB level link or ID (e.g. grabvr.quest/levels/viewer?level=...)">
+          <button class="btn btn-primary" id="fetch-btn">Fetch &amp; View</button>
+        </div>
+
+        <div id="status-area" class="status-area" style="display:none;"></div>
+
+        <!-- 3D Viewport -->
+        <div class="viewport-container" id="viewport-container">
+          <div class="viewport-overlay" id="viewport-overlay">Load a level to begin</div>
+        </div>
+
+        <p class="controls-info">Left click + drag to rotate, scroll to zoom, right click to pan</p>
+
+        <div class="stats-display">
+          <div class="stat-item">
+            <div class="stat-value" id="stat-nodes">0</div>
+            <div class="stat-label">Node Count</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="stat-shapes">0</div>
+            <div class="stat-label">Shapes Rendered</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">PolarsTools &mdash; Not affiliated with GRAB or Slin</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/protobufjs@7/dist/protobuf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="../js/proto.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/preview3d.js"></script>
+  <script src="../js/chatbot.js"></script>
+</body>
+</html>

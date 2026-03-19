@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Converter — PolarsTools</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/protection.js"></script>
+  <style>
+    /* --- Converter-specific styles --- */
+    .converter-upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 48px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+      background: var(--bg-card);
+      margin-bottom: 24px;
+    }
+    .converter-upload-zone:hover,
+    .converter-upload-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(108, 92, 231, 0.06);
+    }
+    .converter-upload-zone .upload-icon {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .converter-upload-zone p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 8px;
+    }
+
+    .or-divider {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .or-divider::before,
+    .or-divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: calc(50% - 30px);
+      height: 1px;
+      background: var(--border);
+    }
+    .or-divider::before { left: 0; }
+    .or-divider::after { right: 0; }
+
+    .link-input-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .link-input-row input {
+      flex: 1;
+    }
+
+    .format-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .format-section h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-heading);
+      margin-bottom: 16px;
+    }
+    .format-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .format-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 14px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+    }
+    .format-option:hover {
+      border-color: var(--accent);
+      background: rgba(108, 92, 231, 0.04);
+    }
+    .format-option.selected {
+      border-color: var(--accent);
+      background: rgba(108, 92, 231, 0.08);
+    }
+    .format-option input[type="radio"] {
+      accent-color: var(--accent);
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+    .format-option-label {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .format-option-label strong {
+      color: var(--text-heading);
+      font-size: 0.95rem;
+    }
+    .format-option-label span {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
+    .converter-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .preview-info-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      display: none;
+    }
+    .preview-info-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-heading);
+      margin-bottom: 12px;
+    }
+    .preview-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .preview-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .preview-stat .label {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 500;
+    }
+    .preview-stat .value {
+      color: var(--cyan);
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .file-loaded-badge {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: rgba(46, 204, 113, 0.08);
+      border: 1px solid rgba(46, 204, 113, 0.3);
+      border-radius: 8px;
+      margin-bottom: 24px;
+      font-size: 0.9rem;
+      color: #2ecc71;
+      font-weight: 500;
+    }
+    .file-loaded-badge .file-name {
+      color: var(--text-heading);
+      font-weight: 600;
+    }
+    .file-loaded-badge .btn-clear {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 0 4px;
+      transition: color var(--transition);
+    }
+    .file-loaded-badge .btn-clear:hover {
+      color: #e74c3c;
+    }
+
+    @media (max-width: 600px) {
+      .link-input-row {
+        flex-direction: column;
+      }
+      .link-input-row .btn {
+        width: 100%;
+      }
+      .format-options {
+        grid-template-columns: 1fr;
+      }
+      .converter-actions {
+        flex-direction: column;
+      }
+      .converter-actions .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav-bar">
+    <div class="container">
+      <a href="../index.html" class="nav-logo">PolarsTools</a>
+      <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle navigation">&#9776;</button>
+      <ul class="nav-links">
+        <li><a href="downloader.html">Downloader</a></li>
+        <li><a href="browser.html">Browser</a></li>
+        <li><a href="image2grab.html">Image2Grab</a></li>
+        <li><a href="colors.html">Colors</a></li>
+        <li><a href="stats.html">Stats</a></li>
+        <li><a href="userlookup.html">User Lookup</a></li>
+        <li><a href="editor.html">Editor</a></li>
+        <li><a href="merger.html">Merger</a></li>
+        <li><a href="generator.html">Generator</a></li>
+        <li><a href="3dpreview.html">3D Preview</a></li>
+        <li><a href="converter.html" class="active">Converter</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <div class="container">
+      <h1>Level Converter</h1>
+      <p class="page-subtitle">Convert GRAB levels between different formats</p>
+
+      <div id="tool-content">
+
+        <!-- File loaded badge -->
+        <div class="file-loaded-badge" id="file-loaded-badge">
+          &#9989; Loaded: <span class="file-name" id="loaded-file-name"></span>
+          <button class="btn-clear" id="clear-file-btn" title="Clear file">&times;</button>
+        </div>
+
+        <!-- Upload zone -->
+        <div class="converter-upload-zone" id="upload-zone">
+          <div class="upload-icon">&#128194;</div>
+          <strong>Drag &amp; drop a .level or .json file here</strong>
+          <p>or click to browse</p>
+          <input type="file" id="file-input" accept=".level,.json" style="display:none;">
+        </div>
+
+        <!-- OR divider -->
+        <div class="or-divider">OR</div>
+
+        <!-- Link input -->
+        <div class="link-input-row">
+          <input type="text" id="level-link" placeholder="Paste GRAB level link or ID (e.g. grabvr.quest/levels/viewer?level=...)">
+          <button class="btn btn-primary" id="fetch-btn">Fetch</button>
+        </div>
+
+        <!-- Output format selector -->
+        <div class="format-section" id="format-section">
+          <h3>Output Format</h3>
+          <div class="format-options">
+            <label class="format-option selected">
+              <input type="radio" name="output-format" value="level" checked>
+              <div class="format-option-label">
+                <strong>.level (Protobuf)</strong>
+                <span>Binary format used by GRAB</span>
+              </div>
+            </label>
+            <label class="format-option">
+              <input type="radio" name="output-format" value="json">
+              <div class="format-option-label">
+                <strong>.json (Human-readable JSON)</strong>
+                <span>Editable text format</span>
+              </div>
+            </label>
+            <label class="format-option">
+              <input type="radio" name="output-format" value="obj">
+              <div class="format-option-label">
+                <strong>.obj (3D Model)</strong>
+                <span>Wavefront OBJ for 3D software</span>
+              </div>
+            </label>
+            <label class="format-option">
+              <input type="radio" name="output-format" value="csv">
+              <div class="format-option-label">
+                <strong>.csv (Spreadsheet)</strong>
+                <span>Node data as rows</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="converter-actions">
+          <button class="btn btn-primary" id="convert-btn" disabled>Convert</button>
+          <button class="btn btn-secondary" id="download-btn" disabled style="display:none;">Download</button>
+        </div>
+
+        <!-- Status -->
+        <div class="status-area" id="status-area" style="display:none;"></div>
+
+        <!-- Preview info -->
+        <div class="preview-info-card" id="preview-info">
+          <h3>Conversion Info</h3>
+          <div class="preview-stats">
+            <div class="preview-stat">
+              <span class="label">Input Format</span>
+              <span class="value" id="info-input-format">--</span>
+            </div>
+            <div class="preview-stat">
+              <span class="label">Output Format</span>
+              <span class="value" id="info-output-format">--</span>
+            </div>
+            <div class="preview-stat">
+              <span class="label">Node Count</span>
+              <span class="value" id="info-node-count">--</span>
+            </div>
+            <div class="preview-stat">
+              <span class="label">Output File Size</span>
+              <span class="value" id="info-file-size">--</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">PolarsTools &mdash; Not affiliated with GRAB or Slin</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/protobufjs@7/dist/protobuf.min.js"></script>
+  <script src="../js/proto.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/converter.js"></script>
+  <script src="../js/chatbot.js"></script>
+</body>
+</html>

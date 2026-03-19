@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PolarsTools — Free Tools for GRAB VR</title>
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/protection.js"></script>
 </head>
 <body>
 
@@ -22,6 +23,9 @@
         <li><a href="pages/userlookup.html">User Lookup</a></li>
         <li><a href="pages/editor.html">Editor</a></li>
         <li><a href="pages/merger.html">Merger</a></li>
+        <li><a href="pages/generator.html">Generator</a></li>
+        <li><a href="pages/preview3d.html">3D Preview</a></li>
+        <li><a href="pages/converter.html">Converter</a></li>
       </ul>
     </div>
   </nav>
@@ -98,6 +102,27 @@
         <a href="pages/merger.html" class="card-link">Open tool</a>
       </div>
 
+      <div class="tool-card">
+        <span class="card-icon">&#x2699;</span>
+        <h3>Generator</h3>
+        <p>Describe a level in words and auto-generate a playable .level file with presets.</p>
+        <a href="pages/generator.html" class="card-link">Open tool</a>
+      </div>
+
+      <div class="tool-card">
+        <span class="card-icon">&#x1F4BB;</span>
+        <h3>3D Preview</h3>
+        <p>View any GRAB level as an interactive 3D scene right in your browser.</p>
+        <a href="pages/preview3d.html" class="card-link">Open tool</a>
+      </div>
+
+      <div class="tool-card">
+        <span class="card-icon">&#x1F504;</span>
+        <h3>Converter</h3>
+        <p>Convert GRAB levels between .level, JSON, OBJ, and CSV formats.</p>
+        <a href="pages/converter.html" class="card-link">Open tool</a>
+      </div>
+
     </div>
   </section>
 
@@ -112,6 +137,7 @@
   <script src="https://cdn.jsdelivr.net/npm/protobufjs@7/dist/protobuf.min.js"></script>
   <script src="js/proto.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/chatbot.js"></script>
 
 </body>
 </html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generator — PolarsTools</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/protection.js"></script>
+  <style>
+    .gen-description {
+      width: 100%;
+      min-height: 120px;
+      padding: 14px 16px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      resize: vertical;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      line-height: 1.6;
+    }
+
+    .gen-description:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+    }
+
+    .gen-description::placeholder {
+      color: var(--text-muted);
+    }
+
+    .preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .btn-preset {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: inherit;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: color var(--transition), border-color var(--transition), background var(--transition);
+    }
+
+    .btn-preset:hover {
+      color: var(--text-heading);
+      border-color: var(--accent);
+      background: rgba(108, 92, 231, 0.08);
+    }
+
+    .btn-preset.active {
+      color: var(--text-heading);
+      border-color: var(--accent);
+      background: rgba(108, 92, 231, 0.15);
+    }
+
+    .settings-row {
+      display: flex;
+      gap: 32px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .setting-group {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .setting-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .setting-group input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .setting-value {
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--cyan);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .generate-row {
+      margin-top: 24px;
+    }
+
+    .preview-card {
+      margin-top: 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .preview-card h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-heading);
+      margin: 0 0 8px;
+    }
+
+    .preview-stats {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .preview-stat {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .preview-stat strong {
+      color: var(--cyan);
+    }
+
+    .preview-summary {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav-bar">
+    <div class="container">
+      <a href="../index.html" class="nav-logo">PolarsTools</a>
+      <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle navigation">&#9776;</button>
+      <ul class="nav-links">
+        <li><a href="downloader.html">Downloader</a></li>
+        <li><a href="browser.html">Browser</a></li>
+        <li><a href="image2grab.html">Image2Grab</a></li>
+        <li><a href="colors.html">Colors</a></li>
+        <li><a href="stats.html">Stats</a></li>
+        <li><a href="userlookup.html">User Lookup</a></li>
+        <li><a href="editor.html">Editor</a></li>
+        <li><a href="merger.html">Merger</a></li>
+        <li><a href="generator.html" class="active">Generator</a></li>
+        <li><a href="3dpreview.html">3D Preview</a></li>
+        <li><a href="converter.html">Converter</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <div class="container">
+      <h1>Level Generator</h1>
+      <p class="page-subtitle">Describe a level and generate it automatically</p>
+
+      <div id="tool-content">
+        <textarea id="gen-description" class="gen-description" placeholder="Describe your level... e.g. 'A floating island parkour course with ice slides and lava pits'"></textarea>
+
+        <div class="preset-row">
+          <button class="btn-preset" data-preset="parkour">Parkour Course</button>
+          <button class="btn-preset" data-preset="admin">Admin Abuse</button>
+          <button class="btn-preset" data-preset="obstacle">Obstacle Course</button>
+          <button class="btn-preset" data-preset="tower">Tower Climb</button>
+          <button class="btn-preset" data-preset="ice">Ice Slide</button>
+          <button class="btn-preset" data-preset="showcase">Showcase Room</button>
+        </div>
+
+        <div class="settings-row">
+          <div class="setting-group">
+            <label>Difficulty</label>
+            <input type="range" id="difficulty-slider" min="0" max="2" value="1" step="1">
+            <div class="setting-value" id="difficulty-label">Medium</div>
+          </div>
+          <div class="setting-group">
+            <label>Size</label>
+            <input type="range" id="size-slider" min="0" max="3" value="1" step="1">
+            <div class="setting-value" id="size-label">Medium</div>
+          </div>
+        </div>
+
+        <div class="generate-row">
+          <button class="btn btn-primary" id="generate-btn">Generate Level</button>
+        </div>
+
+        <div id="status-area" class="status-area" style="display:none;"></div>
+
+        <div id="preview-card" class="preview-card" style="display:none;">
+          <h2 id="preview-title"></h2>
+          <div class="preview-stats">
+            <span class="preview-stat">Nodes: <strong id="preview-nodes">0</strong></span>
+            <span class="preview-stat">Difficulty: <strong id="preview-difficulty"></strong></span>
+            <span class="preview-stat">Size: <strong id="preview-size"></strong></span>
+          </div>
+          <div class="preview-summary" id="preview-summary"></div>
+          <button class="btn btn-primary" id="download-btn">Download .level</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">PolarsTools &mdash; Not affiliated with GRAB or Slin</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/protobufjs@7/dist/protobuf.min.js"></script>
+  <script src="../js/proto.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/generator.js"></script>
+  <script src="../js/chatbot.js"></script>
+</body>
+</html>
