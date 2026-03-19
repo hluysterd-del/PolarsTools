@@ -15,9 +15,12 @@
       <ul class="nav-links">
         <li><a href="downloader.html">Downloader</a></li>
         <li><a href="browser.html">Browser</a></li>
+        <li><a href="image2grab.html">Image2Grab</a></li>
+        <li><a href="colors.html">Colors</a></li>
         <li><a href="stats.html" class="active">Stats</a></li>
         <li><a href="userlookup.html">User Lookup</a></li>
         <li><a href="editor.html">Editor</a></li>
+        <li><a href="merger.html">Merger</a></li>
       </ul>
     </div>
   </nav>
@@ -26,7 +29,73 @@
     <div class="container">
       <h1>Level Stats</h1>
       <p class="page-subtitle">View detailed statistics for any GRAB level.</p>
-      <div id="tool-content"></div>
+      <div id="tool-content">
+        <div class="downloader-input-row">
+          <input type="text" id="stats-input" placeholder="Paste GRAB level link or identifier">
+          <button class="btn btn-primary" id="lookup-btn">Look Up</button>
+        </div>
+
+        <div id="status-area" class="status-area" style="display:none;"></div>
+
+        <div id="result-card" style="display:none; margin-top: 28px;">
+          <!-- Thumbnail -->
+          <div style="border-radius: var(--radius); overflow: hidden; background: var(--bg-card); border: 1px solid var(--border); margin-bottom: 24px;">
+            <img id="result-thumb" src="" alt="Level thumbnail" style="width: 100%; max-height: 400px; object-fit: cover;">
+          </div>
+
+          <!-- Info card -->
+          <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 32px; margin-bottom: 24px;">
+            <h2 id="result-title" style="font-size: 1.6rem; font-weight: 800; color: var(--text-heading); margin-bottom: 6px;"></h2>
+            <p id="result-creators" style="color: var(--cyan); font-size: 0.95rem; font-weight: 500; margin-bottom: 8px;"></p>
+            <p id="result-desc" style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.65;"></p>
+          </div>
+
+          <!-- Stats dashboard -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
+
+            <!-- Plays -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 20px; text-align: center;">
+              <div style="font-size: 1.6rem; margin-bottom: 8px;">&#127918;</div>
+              <div id="stat-plays" style="font-size: 2rem; font-weight: 800; color: var(--text-heading); line-height: 1.2;">--</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; text-transform: uppercase; letter-spacing: 1px;">Plays</div>
+            </div>
+
+            <!-- Difficulty -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 20px; text-align: center;">
+              <div style="font-size: 1.6rem; margin-bottom: 8px;">&#9888;&#65039;</div>
+              <div id="stat-difficulty" style="display: inline-block; font-size: 1rem; font-weight: 700; padding: 6px 16px; border-radius: 20px; line-height: 1.4;">--</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px; text-transform: uppercase; letter-spacing: 1px;">Difficulty</div>
+            </div>
+
+            <!-- Likes -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 20px; text-align: center;">
+              <div style="font-size: 1.6rem; margin-bottom: 8px;">&#10084;&#65039;</div>
+              <div id="stat-likes" style="font-size: 2rem; font-weight: 800; color: var(--text-heading); line-height: 1.2;">--</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; text-transform: uppercase; letter-spacing: 1px;">Like Ratio</div>
+            </div>
+
+            <!-- Time -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 20px; text-align: center;">
+              <div style="font-size: 1.6rem; margin-bottom: 8px;">&#9201;</div>
+              <div id="stat-time" style="font-size: 2rem; font-weight: 800; color: var(--text-heading); line-height: 1.2; font-variant-numeric: tabular-nums;">--:--</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; text-transform: uppercase; letter-spacing: 1px;">Avg Time</div>
+            </div>
+
+            <!-- Complexity -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 20px; text-align: center;">
+              <div style="font-size: 1.6rem; margin-bottom: 8px;">&#129513;</div>
+              <div id="stat-complexity" style="font-size: 2rem; font-weight: 800; color: var(--text-heading); line-height: 1.2;">--</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; text-transform: uppercase; letter-spacing: 1px;">Complexity</div>
+            </div>
+
+          </div>
+
+          <!-- Viewer link -->
+          <a id="result-viewer-link" href="#" target="_blank" rel="noopener" class="btn btn-secondary" style="margin-bottom: 32px;">
+            Open in GRAB Level Viewer &#8599;
+          </a>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -37,5 +106,6 @@
   <script src="https://cdn.jsdelivr.net/npm/protobufjs@7/dist/protobuf.min.js"></script>
   <script src="../js/proto.js"></script>
   <script src="../js/api.js"></script>
+  <script src="../js/stats.js"></script>
 </body>
 </html>

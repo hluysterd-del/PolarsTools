@@ -5,6 +5,203 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Merger — PolarsTools</title>
   <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* --- Merger-specific styles --- */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 48px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+      background: var(--bg-card);
+      margin-bottom: 24px;
+    }
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(108, 92, 231, 0.06);
+    }
+    .upload-zone p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 8px;
+    }
+    .upload-zone .upload-icon {
+      font-size: 2.5rem;
+      margin-bottom: 8px;
+    }
+    .upload-zone input[type="file"] {
+      display: none;
+    }
+
+    .level-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .level-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      gap: 16px;
+    }
+    .level-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .level-item-name {
+      font-weight: 600;
+      color: var(--text-heading);
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .level-item-meta {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      margin-top: 2px;
+    }
+    .level-item .btn-remove {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: color var(--transition), border-color var(--transition), background var(--transition);
+    }
+    .level-item .btn-remove:hover {
+      color: #e74c3c;
+      border-color: #e74c3c;
+      background: rgba(231, 76, 60, 0.08);
+    }
+
+    .merge-settings {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .merge-settings h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-heading);
+      margin-bottom: 16px;
+    }
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .settings-grid .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .settings-grid .field.full-width {
+      grid-column: 1 / -1;
+    }
+    .settings-grid label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .settings-grid input[type="number"] {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .settings-grid input[type="number"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+    }
+    .radio-group {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    .radio-group input[type="radio"] {
+      accent-color: var(--accent);
+    }
+
+    .merge-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .result-info {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      display: none;
+    }
+    .result-info h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-heading);
+      margin-bottom: 8px;
+    }
+    .result-stats {
+      display: flex;
+      gap: 24px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .result-stats span {
+      color: var(--cyan);
+      font-weight: 600;
+    }
+
+    @media (max-width: 600px) {
+      .settings-grid {
+        grid-template-columns: 1fr;
+      }
+      .merge-actions {
+        flex-direction: column;
+      }
+      .merge-actions .btn {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -15,9 +212,12 @@
       <ul class="nav-links">
         <li><a href="downloader.html">Downloader</a></li>
         <li><a href="browser.html">Browser</a></li>
+        <li><a href="image2grab.html">Image2Grab</a></li>
+        <li><a href="colors.html">Colors</a></li>
         <li><a href="stats.html">Stats</a></li>
         <li><a href="userlookup.html">User Lookup</a></li>
         <li><a href="editor.html">Editor</a></li>
+        <li><a href="merger.html" class="active">Merger</a></li>
       </ul>
     </div>
   </nav>
@@ -26,7 +226,63 @@
     <div class="container">
       <h1>Level Merger</h1>
       <p class="page-subtitle">Combine multiple GRAB levels into one.</p>
-      <div id="tool-content"></div>
+
+      <div id="tool-content">
+        <!-- Upload Zone -->
+        <div class="upload-zone" id="upload-zone">
+          <div class="upload-icon">&#128194;</div>
+          <strong>Drop .level files here or click to upload</strong>
+          <p>Upload 2 or more .level files to merge them together.</p>
+          <input type="file" id="file-input" multiple accept=".level">
+        </div>
+
+        <!-- Level List -->
+        <div class="level-list" id="level-list"></div>
+
+        <!-- Merge Settings -->
+        <div class="merge-settings" id="merge-settings" style="display: none;">
+          <h3>Merge Settings</h3>
+          <div class="settings-grid">
+            <div class="field">
+              <label for="spacing-x">X Spacing</label>
+              <input type="number" id="spacing-x" value="50" step="1">
+            </div>
+            <div class="field">
+              <label for="spacing-z">Z Spacing</label>
+              <input type="number" id="spacing-z" value="0" step="1">
+            </div>
+            <div class="field full-width">
+              <label>Arrangement</label>
+              <div class="radio-group">
+                <label><input type="radio" name="arrangement" value="side-by-side" checked> Side by Side (X)</label>
+                <label><input type="radio" name="arrangement" value="grid"> Grid</label>
+              </div>
+            </div>
+            <div class="field full-width">
+              <label for="merged-title">Merged Level Title</label>
+              <input type="text" id="merged-title" placeholder="Merged Level">
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="merge-actions">
+          <button class="btn btn-primary" id="merge-btn" disabled>Merge</button>
+          <button class="btn btn-secondary" id="download-btn" disabled style="display: none;">Download Merged .level</button>
+        </div>
+
+        <!-- Status -->
+        <div class="status-area" id="status-area" style="display: none;"></div>
+
+        <!-- Result Info -->
+        <div class="result-info" id="result-info">
+          <h3>Merge Result</h3>
+          <div class="result-stats">
+            <div>Total Nodes: <span id="result-nodes">0</span></div>
+            <div>Estimated Complexity: <span id="result-complexity">0</span></div>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -37,5 +293,6 @@
   <script src="https://cdn.jsdelivr.net/npm/protobufjs@7/dist/protobuf.min.js"></script>
   <script src="../js/proto.js"></script>
   <script src="../js/api.js"></script>
+  <script src="../js/merger.js"></script>
 </body>
 </html>

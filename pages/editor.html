@@ -15,9 +15,12 @@
       <ul class="nav-links">
         <li><a href="downloader.html">Downloader</a></li>
         <li><a href="browser.html">Browser</a></li>
+        <li><a href="image2grab.html">Image2Grab</a></li>
+        <li><a href="colors.html">Colors</a></li>
         <li><a href="stats.html">Stats</a></li>
         <li><a href="userlookup.html">User Lookup</a></li>
         <li><a href="editor.html" class="active">Editor</a></li>
+        <li><a href="merger.html">Merger</a></li>
       </ul>
     </div>
   </nav>
@@ -26,7 +29,61 @@
     <div class="container">
       <h1>Level Editor</h1>
       <p class="page-subtitle">Inspect and edit GRAB level files in the browser.</p>
-      <div id="tool-content"></div>
+      <div id="tool-content">
+
+        <!-- Input method tabs -->
+        <div class="editor-tabs">
+          <button class="editor-tab active" data-tab="upload">Upload File</button>
+          <button class="editor-tab" data-tab="link">Paste Link</button>
+        </div>
+
+        <!-- Upload panel -->
+        <div class="editor-panel active" id="panel-upload">
+          <div class="drop-zone" id="drop-zone">
+            <div class="drop-zone-text">
+              <span class="drop-icon">&#128194;</span>
+              <p>Drag &amp; drop a <strong>.level</strong> file here</p>
+              <p class="text-muted">or click to browse</p>
+            </div>
+            <input type="file" id="file-input" accept=".level" style="display:none;">
+          </div>
+        </div>
+
+        <!-- Link panel -->
+        <div class="editor-panel" id="panel-link">
+          <div class="downloader-input-row">
+            <input type="text" id="level-url" placeholder="Paste GRAB level link or ID (e.g. grabvr.quest/levels/viewer?level=...)">
+            <button class="btn btn-primary" id="fetch-btn">Fetch</button>
+          </div>
+        </div>
+
+        <!-- Status / error display -->
+        <div id="status-area" class="status-area" style="display:none;"></div>
+
+        <!-- Editor section (hidden until level loaded) -->
+        <div id="editor-section" style="display:none;">
+
+          <!-- Info bar -->
+          <div class="editor-info-bar">
+            <span id="node-count">Nodes: 0</span>
+            <span id="json-status" class="json-valid">Valid JSON</span>
+          </div>
+
+          <!-- Toolbar -->
+          <div class="editor-toolbar">
+            <button class="btn btn-secondary btn-sm" id="format-btn">Format JSON</button>
+            <button class="btn btn-secondary btn-sm" id="minify-btn">Minify</button>
+            <button class="btn btn-primary btn-sm" id="download-btn">Download as .level</button>
+          </div>
+
+          <!-- Code editor textarea -->
+          <div class="editor-wrap">
+            <div class="line-numbers" id="line-numbers"></div>
+            <textarea id="json-editor" spellcheck="false"></textarea>
+          </div>
+
+        </div>
+      </div>
     </div>
   </main>
 
@@ -34,8 +91,169 @@
     <div class="container">PolarsTools &mdash; Not affiliated with GRAB or Slin</div>
   </footer>
 
+  <style>
+    /* --- Editor Tabs --- */
+    .editor-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .editor-tab {
+      padding: 10px 24px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      font-family: inherit;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: color var(--transition), border-color var(--transition);
+    }
+    .editor-tab:hover {
+      color: var(--text);
+    }
+    .editor-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* --- Panels --- */
+    .editor-panel { display: none; }
+    .editor-panel.active { display: block; }
+
+    /* --- Drop Zone --- */
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 48px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+      background: var(--bg-card);
+    }
+    .drop-zone:hover,
+    .drop-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(108, 92, 231, 0.06);
+    }
+    .drop-icon {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .drop-zone p {
+      margin: 4px 0;
+      font-size: 0.95rem;
+    }
+    .text-muted {
+      color: var(--text-muted);
+      font-size: 0.85rem !important;
+    }
+
+    /* --- Info Bar --- */
+    .editor-info-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px 8px 0 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 20px;
+    }
+    .json-valid {
+      color: #2ecc71;
+      font-weight: 600;
+    }
+    .json-invalid {
+      color: #e74c3c;
+      font-weight: 600;
+    }
+
+    /* --- Toolbar --- */
+    .editor-toolbar {
+      display: flex;
+      gap: 8px;
+      padding: 10px 16px;
+      background: var(--bg-card);
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+    }
+    .btn-sm {
+      padding: 8px 16px;
+      font-size: 0.85rem;
+    }
+
+    /* --- Code Editor --- */
+    .editor-wrap {
+      position: relative;
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: 0 0 8px 8px;
+      overflow: hidden;
+    }
+    .line-numbers {
+      flex-shrink: 0;
+      width: 52px;
+      padding: 16px 8px 16px 0;
+      text-align: right;
+      font-family: 'Consolas', 'Monaco', 'Fira Code', monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-muted);
+      background: #0d0d18;
+      border-right: 1px solid var(--border);
+      user-select: none;
+      overflow: hidden;
+    }
+    #json-editor {
+      flex: 1;
+      min-height: 500px;
+      padding: 16px;
+      font-family: 'Consolas', 'Monaco', 'Fira Code', monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #c8d6e5;
+      background: #0f0f1a;
+      border: none;
+      outline: none;
+      resize: vertical;
+      tab-size: 2;
+      white-space: pre;
+      overflow-wrap: normal;
+      overflow-x: auto;
+    }
+    #json-editor::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* --- Responsive --- */
+    @media (max-width: 600px) {
+      .editor-toolbar {
+        flex-wrap: wrap;
+      }
+      .editor-toolbar .btn {
+        flex: 1;
+        min-width: 100px;
+      }
+      .line-numbers {
+        width: 40px;
+        font-size: 11px;
+      }
+      #json-editor {
+        font-size: 12px;
+        min-height: 350px;
+      }
+    }
+  </style>
+
   <script src="https://cdn.jsdelivr.net/npm/protobufjs@7/dist/protobuf.min.js"></script>
   <script src="../js/proto.js"></script>
   <script src="../js/api.js"></script>
+  <script src="../js/editor.js"></script>
 </body>
 </html>

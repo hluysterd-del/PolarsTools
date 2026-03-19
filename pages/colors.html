@@ -5,6 +5,453 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Colors — PolarsTools</title>
   <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* --- Color Tool Styles --- */
+    .color-tool {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* Preview Section */
+    .color-preview-section {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .color-preview-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .color-preview-card label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .color-preview-box {
+      width: 200px;
+      height: 200px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      transition: background-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+      /* checkerboard for transparency */
+      background-image:
+        linear-gradient(45deg, #1a1a2e 25%, transparent 25%),
+        linear-gradient(-45deg, #1a1a2e 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #1a1a2e 75%),
+        linear-gradient(-45deg, transparent 75%, #1a1a2e 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .color-preview-box .color-fill {
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius);
+      transition: background-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    }
+
+    .color-preview-box.main-preview {
+      width: 260px;
+      height: 260px;
+    }
+
+    /* Presets */
+    .presets-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+    }
+
+    .presets-section h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 14px;
+    }
+
+    .preset-list {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .preset-btn {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+      overflow: hidden;
+      /* checkerboard for transparent preset */
+      background-image:
+        linear-gradient(45deg, #1a1a2e 25%, transparent 25%),
+        linear-gradient(-45deg, #1a1a2e 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #1a1a2e 75%),
+        linear-gradient(-45deg, transparent 75%, #1a1a2e 75%);
+      background-size: 8px 8px;
+      background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+    }
+
+    .preset-btn .preset-fill {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+    }
+
+    .preset-btn:hover {
+      transform: scale(1.15);
+      border-color: var(--accent);
+      box-shadow: 0 0 12px rgba(108, 92, 231, 0.4);
+    }
+
+    .preset-btn:active {
+      transform: scale(0.95);
+    }
+
+    .preset-label {
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity var(--transition);
+      z-index: 10;
+    }
+
+    .preset-btn:hover .preset-label {
+      opacity: 1;
+    }
+
+    /* Controls */
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .control-group {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+    }
+
+    .control-group h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .slider-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .slider-label {
+      width: 20px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-heading);
+      flex-shrink: 0;
+    }
+
+    .slider-label.label-r { color: #ff6b6b; }
+    .slider-label.label-g { color: #51cf66; }
+    .slider-label.label-b { color: #339af0; }
+    .slider-label.label-a { color: var(--text-muted); }
+    .slider-label.label-h { color: #ffd43b; }
+    .slider-label.label-s { color: #ff922b; }
+    .slider-label.label-v, .slider-label.label-l { color: #e0e0e0; }
+
+    input[type="range"] {
+      flex: 1;
+      height: 6px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--border);
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 2px solid var(--text-heading);
+      cursor: pointer;
+      transition: box-shadow 0.15s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      box-shadow: 0 0 8px rgba(108, 92, 231, 0.5);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 2px solid var(--text-heading);
+      cursor: pointer;
+    }
+
+    .slider-num {
+      width: 60px;
+      padding: 6px 8px;
+      font-size: 0.85rem;
+      font-family: 'Consolas', 'Monaco', monospace;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      outline: none;
+      text-align: center;
+      transition: border-color var(--transition);
+      flex-shrink: 0;
+    }
+
+    .slider-num:focus {
+      border-color: var(--accent);
+    }
+
+    /* Hex input */
+    .hex-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .hex-input {
+      flex: 1;
+      padding: 10px 14px;
+      font-size: 1rem;
+      font-family: 'Consolas', 'Monaco', monospace;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+
+    .hex-input:focus {
+      border-color: var(--accent);
+    }
+
+    .hex-swatch {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    /* Modded Mode */
+    .modded-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+    }
+
+    .modded-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 48px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 13px;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      left: 3px;
+      bottom: 3px;
+      background: var(--text);
+      border-radius: 50%;
+      transition: transform var(--transition);
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      background: var(--accent);
+    }
+
+    .toggle-switch input:checked + .toggle-slider::before {
+      transform: translateX(22px);
+    }
+
+    .modded-label {
+      font-weight: 700;
+      color: var(--text-heading);
+      font-size: 1rem;
+    }
+
+    .modded-warning {
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: rgba(255, 107, 107, 0.08);
+      border: 1px solid rgba(255, 107, 107, 0.25);
+      border-radius: 8px;
+      color: #ff6b6b;
+      font-size: 0.85rem;
+      display: none;
+    }
+
+    .modded-warning.visible {
+      display: block;
+    }
+
+    /* Output */
+    .output-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+    }
+
+    .output-section h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .output-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .output-value {
+      flex: 1;
+      padding: 14px 18px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 1.05rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--cyan);
+      user-select: all;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .copy-btn {
+      padding: 12px 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition);
+      white-space: nowrap;
+      font-family: inherit;
+    }
+
+    .copy-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    .copy-btn:active {
+      transform: scale(0.95);
+    }
+
+    .copy-btn.copied {
+      background: #2ecc71;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .controls-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .color-preview-box {
+        width: 140px;
+        height: 140px;
+      }
+
+      .color-preview-box.main-preview {
+        width: 180px;
+        height: 180px;
+      }
+
+      .output-box {
+        flex-direction: column;
+      }
+
+      .output-value {
+        width: 100%;
+      }
+
+      .copy-btn {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -15,18 +462,172 @@
       <ul class="nav-links">
         <li><a href="downloader.html">Downloader</a></li>
         <li><a href="browser.html">Browser</a></li>
+        <li><a href="image2grab.html">Image2Grab</a></li>
+        <li><a href="colors.html" class="active">Colors</a></li>
         <li><a href="stats.html">Stats</a></li>
         <li><a href="userlookup.html">User Lookup</a></li>
         <li><a href="editor.html">Editor</a></li>
+        <li><a href="merger.html">Merger</a></li>
       </ul>
     </div>
   </nav>
 
   <main class="page-content">
     <div class="container">
-      <h1>Colors</h1>
-      <p class="page-subtitle">Pick and preview GRAB material colors and palettes.</p>
-      <div id="tool-content"></div>
+      <h1>Modded Colors</h1>
+      <p class="page-subtitle">Pick and preview GRAB material colors, including modded out-of-range values.</p>
+
+      <div id="tool-content">
+        <div class="color-tool">
+
+          <!-- Color Previews -->
+          <div class="color-preview-section">
+            <div class="color-preview-card">
+              <label>Default</label>
+              <div class="color-preview-box main-preview" id="preview-default">
+                <div class="color-fill"></div>
+              </div>
+            </div>
+            <div class="color-preview-card">
+              <label>Neon</label>
+              <div class="color-preview-box" id="preview-neon">
+                <div class="color-fill"></div>
+              </div>
+            </div>
+            <div class="color-preview-card">
+              <label>Transparent</label>
+              <div class="color-preview-box" id="preview-transparent">
+                <div class="color-fill"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Presets -->
+          <div class="presets-section">
+            <h3>Presets</h3>
+            <div class="preset-list" id="preset-list"></div>
+          </div>
+
+          <!-- Controls Grid -->
+          <div class="controls-grid">
+
+            <!-- RGB Sliders -->
+            <div class="control-group">
+              <h3>RGB (0 - 255)</h3>
+              <div class="slider-row">
+                <span class="slider-label label-r">R</span>
+                <input type="range" id="rgb-r" min="0" max="255" value="128">
+                <input type="number" class="slider-num" id="rgb-r-num" min="0" max="255" value="128">
+              </div>
+              <div class="slider-row">
+                <span class="slider-label label-g">G</span>
+                <input type="range" id="rgb-g" min="0" max="255" value="64">
+                <input type="number" class="slider-num" id="rgb-g-num" min="0" max="255" value="64">
+              </div>
+              <div class="slider-row">
+                <span class="slider-label label-b">B</span>
+                <input type="range" id="rgb-b" min="0" max="255" value="255">
+                <input type="number" class="slider-num" id="rgb-b-num" min="0" max="255" value="255">
+              </div>
+              <div class="slider-row">
+                <span class="slider-label label-a">A</span>
+                <input type="range" id="rgb-a" min="0" max="255" value="255">
+                <input type="number" class="slider-num" id="rgb-a-num" min="0" max="255" value="255">
+              </div>
+            </div>
+
+            <!-- Float Values -->
+            <div class="control-group">
+              <h3>Float (0.0 - 1.0)</h3>
+              <div class="slider-row">
+                <span class="slider-label label-r">R</span>
+                <input type="number" class="slider-num" id="float-r" step="0.001" min="0" max="1" value="0.502" style="flex:1;">
+              </div>
+              <div class="slider-row">
+                <span class="slider-label label-g">G</span>
+                <input type="number" class="slider-num" id="float-g" step="0.001" min="0" max="1" value="0.251" style="flex:1;">
+              </div>
+              <div class="slider-row">
+                <span class="slider-label label-b">B</span>
+                <input type="number" class="slider-num" id="float-b" step="0.001" min="0" max="1" value="1.000" style="flex:1;">
+              </div>
+              <div class="slider-row">
+                <span class="slider-label label-a">A</span>
+                <input type="number" class="slider-num" id="float-a" step="0.001" min="0" max="1" value="1.000" style="flex:1;">
+              </div>
+            </div>
+
+            <!-- Hex -->
+            <div class="control-group">
+              <h3>Hex</h3>
+              <div class="hex-row">
+                <div class="hex-swatch" id="hex-swatch"></div>
+                <input type="text" class="hex-input" id="hex-input" value="#8040FF" maxlength="7" spellcheck="false">
+              </div>
+            </div>
+
+            <!-- HSV / HSL -->
+            <div class="control-group">
+              <h3>HSV / HSL</h3>
+              <div class="slider-row">
+                <span class="slider-label label-h">H</span>
+                <input type="range" id="hsv-h" min="0" max="360" value="0">
+                <input type="number" class="slider-num" id="hsv-h-num" min="0" max="360" value="0">
+              </div>
+              <div class="slider-row">
+                <span class="slider-label label-s">S</span>
+                <input type="range" id="hsv-s" min="0" max="100" value="0">
+                <input type="number" class="slider-num" id="hsv-s-num" min="0" max="100" value="0">
+              </div>
+              <div class="slider-row">
+                <span class="slider-label label-v">V</span>
+                <input type="range" id="hsv-v" min="0" max="100" value="0">
+                <input type="number" class="slider-num" id="hsv-v-num" min="0" max="100" value="0">
+              </div>
+              <hr style="border:none;border-top:1px solid var(--border);margin:10px 0;">
+              <div class="slider-row">
+                <span class="slider-label label-h">H</span>
+                <input type="range" id="hsl-h" min="0" max="360" value="0">
+                <input type="number" class="slider-num" id="hsl-h-num" min="0" max="360" value="0">
+              </div>
+              <div class="slider-row">
+                <span class="slider-label label-s">S</span>
+                <input type="range" id="hsl-s" min="0" max="100" value="0">
+                <input type="number" class="slider-num" id="hsl-s-num" min="0" max="100" value="0">
+              </div>
+              <div class="slider-row">
+                <span class="slider-label label-l">L</span>
+                <input type="range" id="hsl-l" min="0" max="100" value="0">
+                <input type="number" class="slider-num" id="hsl-l-num" min="0" max="100" value="0">
+              </div>
+            </div>
+          </div>
+
+          <!-- Modded Mode -->
+          <div class="modded-section">
+            <div class="modded-header">
+              <label class="toggle-switch">
+                <input type="checkbox" id="modded-toggle">
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="modded-label">Modded Mode</span>
+            </div>
+            <div class="modded-warning" id="modded-warning">
+              Modded colors may not display correctly in all situations. Values outside 0-1 produce wild effects in GRAB.
+            </div>
+          </div>
+
+          <!-- Output -->
+          <div class="output-section">
+            <h3>Protobuf Color Output</h3>
+            <div class="output-box">
+              <div class="output-value" id="output-value">{ r: 0.502, g: 0.251, b: 1.000, a: 1.000 }</div>
+              <button class="copy-btn" id="copy-btn">Copy</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
   </main>
 
@@ -37,5 +638,6 @@
   <script src="https://cdn.jsdelivr.net/npm/protobufjs@7/dist/protobuf.min.js"></script>
   <script src="../js/proto.js"></script>
   <script src="../js/api.js"></script>
+  <script src="../js/colors.js"></script>
 </body>
 </html>

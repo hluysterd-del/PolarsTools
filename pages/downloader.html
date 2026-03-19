@@ -15,9 +15,12 @@
       <ul class="nav-links">
         <li><a href="downloader.html" class="active">Downloader</a></li>
         <li><a href="browser.html">Browser</a></li>
+        <li><a href="image2grab.html">Image2Grab</a></li>
+        <li><a href="colors.html">Colors</a></li>
         <li><a href="stats.html">Stats</a></li>
         <li><a href="userlookup.html">User Lookup</a></li>
         <li><a href="editor.html">Editor</a></li>
+        <li><a href="merger.html">Merger</a></li>
       </ul>
     </div>
   </nav>
@@ -27,7 +30,25 @@
       <h1>Level Downloader</h1>
       <p class="page-subtitle">Download any GRAB level by pasting a link or identifier.</p>
       <div id="tool-content">
-        <!-- Tool UI will go here -->
+        <div class="downloader-input-row">
+          <input type="text" id="level-input" placeholder="Paste GRAB level link or ID (e.g. grabvr.quest/levels/viewer?level=...)">
+          <button class="btn btn-primary" id="fetch-btn">Download</button>
+        </div>
+
+        <div id="status-area" class="status-area" style="display:none;"></div>
+
+        <div id="preview-card" class="card level-preview" style="display:none;">
+          <div class="preview-thumb">
+            <img id="preview-img" src="" alt="Level thumbnail">
+          </div>
+          <div class="preview-info">
+            <h2 id="preview-title"></h2>
+            <p class="preview-creators" id="preview-creators"></p>
+            <p class="preview-complexity" id="preview-complexity"></p>
+            <p class="preview-desc" id="preview-desc"></p>
+            <button class="btn btn-primary" id="download-btn">Download .level</button>
+          </div>
+        </div>
       </div>
     </div>
   </main>
@@ -39,5 +60,6 @@
   <script src="https://cdn.jsdelivr.net/npm/protobufjs@7/dist/protobuf.min.js"></script>
   <script src="../js/proto.js"></script>
   <script src="../js/api.js"></script>
+  <script src="../js/downloader.js"></script>
 </body>
 </html>

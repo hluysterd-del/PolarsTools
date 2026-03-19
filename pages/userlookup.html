@@ -15,9 +15,12 @@
       <ul class="nav-links">
         <li><a href="downloader.html">Downloader</a></li>
         <li><a href="browser.html">Browser</a></li>
+        <li><a href="image2grab.html">Image2Grab</a></li>
+        <li><a href="colors.html">Colors</a></li>
         <li><a href="stats.html">Stats</a></li>
         <li><a href="userlookup.html" class="active">User Lookup</a></li>
         <li><a href="editor.html">Editor</a></li>
+        <li><a href="merger.html">Merger</a></li>
       </ul>
     </div>
   </nav>
@@ -26,7 +29,27 @@
     <div class="container">
       <h1>User Lookup</h1>
       <p class="page-subtitle">Search for GRAB players and explore their published levels.</p>
-      <div id="tool-content"></div>
+      <div id="tool-content">
+        <div class="downloader-input-row">
+          <input type="search" id="user-search-input" placeholder="Search for a GRAB player...">
+          <button class="btn btn-primary" id="user-search-btn">Search</button>
+        </div>
+
+        <div id="user-status" class="status-area" style="display:none;"></div>
+
+        <ul id="user-results-list" class="user-results-list" style="display:none;"></ul>
+
+        <div id="user-profile" class="user-profile" style="display:none;">
+          <h2 id="profile-username"></h2>
+          <small id="profile-userid" class="text-muted"></small>
+          <div class="profile-links">
+            <a id="profile-grablink" href="#" target="_blank" rel="noopener">View on GRAB</a>
+            <span id="profile-level-count" class="text-muted"></span>
+          </div>
+        </div>
+
+        <div id="user-levels-grid" class="card-grid" style="display:none;"></div>
+      </div>
     </div>
   </main>
 
@@ -37,5 +60,6 @@
   <script src="https://cdn.jsdelivr.net/npm/protobufjs@7/dist/protobuf.min.js"></script>
   <script src="../js/proto.js"></script>
   <script src="../js/api.js"></script>
+  <script src="../js/userlookup.js"></script>
 </body>
 </html>

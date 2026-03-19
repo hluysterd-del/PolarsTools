@@ -5,6 +5,178 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Browser — PolarsTools</title>
   <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* ---- Browser-specific styles ---- */
+    .browser-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .browser-filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    .browser-filter-row label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .browser-filter-row input[type="number"],
+    .browser-filter-row select {
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      width: 120px;
+    }
+    .browser-filter-row select {
+      width: 150px;
+      cursor: pointer;
+    }
+    .browser-filter-row input[type="number"]:focus,
+    .browser-filter-row select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(108,92,231,0.15);
+    }
+    #browser-results-count {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    /* Spinner */
+    .browser-spinner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 48px 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Grid */
+    .browser-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    /* Card */
+    .browser-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+    }
+    .browser-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent);
+      box-shadow: 0 6px 24px rgba(108,92,231,0.12);
+    }
+    .browser-card-thumb {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      background: var(--border);
+    }
+    .browser-card-thumb--placeholder {
+      background: linear-gradient(135deg, #1a1a2e, #2a2a3f);
+    }
+    .browser-card-body {
+      padding: 14px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+    .browser-card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-heading);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .browser-card-creators {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .browser-card-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 4px;
+      font-size: 0.82rem;
+    }
+    .browser-card-plays,
+    .browser-card-like {
+      color: var(--text-muted);
+    }
+    .browser-badge {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+    .badge-easy   { background: rgba(46,204,113,0.15); color: #2ecc71; }
+    .badge-medium { background: rgba(241,196,15,0.15); color: #f1c40f; }
+    .badge-hard   { background: rgba(231,76,60,0.15);  color: #e74c3c; }
+    .badge-unknown { background: rgba(136,136,160,0.12); color: var(--text-muted); }
+
+    .browser-card-dl {
+      margin-top: auto;
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      width: 100%;
+    }
+
+    /* Load more */
+    .browser-load-more-wrap {
+      display: none;
+      justify-content: center;
+      padding: 32px 0 16px;
+    }
+
+    .browser-error {
+      color: #e74c3c;
+      text-align: center;
+      padding: 32px 0;
+    }
+
+    @media (max-width: 768px) {
+      .browser-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 14px;
+      }
+      .browser-filter-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .browser-filter-row input[type="number"],
+      .browser-filter-row select {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -15,9 +187,12 @@
       <ul class="nav-links">
         <li><a href="downloader.html">Downloader</a></li>
         <li><a href="browser.html" class="active">Browser</a></li>
+        <li><a href="image2grab.html">Image2Grab</a></li>
+        <li><a href="colors.html">Colors</a></li>
         <li><a href="stats.html">Stats</a></li>
         <li><a href="userlookup.html">User Lookup</a></li>
         <li><a href="editor.html">Editor</a></li>
+        <li><a href="merger.html">Merger</a></li>
       </ul>
     </div>
   </nav>
@@ -26,7 +201,52 @@
     <div class="container">
       <h1>Level Browser</h1>
       <p class="page-subtitle">Browse and search through published GRAB levels.</p>
-      <div id="tool-content"></div>
+      <div id="tool-content">
+        <!-- Controls -->
+        <div class="browser-controls">
+          <input type="search" id="browser-search" placeholder="Search by title or creator...">
+          <div class="browser-filter-row">
+            <label>Complexity:
+              <input type="number" id="browser-min-complexity" placeholder="Min" min="0">
+              <span style="color:var(--text-muted);">&ndash;</span>
+              <input type="number" id="browser-max-complexity" placeholder="Max" min="0">
+            </label>
+            <label>Difficulty:
+              <select id="browser-difficulty">
+                <option value="any">Any</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </label>
+            <label>Sort:
+              <select id="browser-sort">
+                <option value="most_played">Most Played</option>
+                <option value="most_liked">Most Liked</option>
+                <option value="newest">Newest</option>
+                <option value="hardest">Hardest</option>
+                <option value="easiest">Easiest</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <!-- Results count -->
+        <div id="browser-results-count"></div>
+
+        <!-- Spinner -->
+        <div id="browser-spinner" class="browser-spinner" style="display:none;">
+          <span class="loading"></span> Loading levels...
+        </div>
+
+        <!-- Grid -->
+        <div id="browser-grid" class="browser-grid"></div>
+
+        <!-- Load More -->
+        <div id="browser-load-more-wrap" class="browser-load-more-wrap">
+          <button id="browser-load-more" class="btn btn-primary">Load More</button>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -37,5 +257,6 @@
   <script src="https://cdn.jsdelivr.net/npm/protobufjs@7/dist/protobuf.min.js"></script>
   <script src="../js/proto.js"></script>
   <script src="../js/api.js"></script>
+  <script src="../js/browser.js"></script>
 </body>
 </html>
