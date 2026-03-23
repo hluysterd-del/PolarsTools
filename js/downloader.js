@@ -1,6 +1,29 @@
 (function () {
   'use strict';
 
+  // TOS gate
+  const tosGate = document.getElementById('tos-gate');
+  const tosCheckbox = document.getElementById('tos-checkbox');
+  const tosAccept = document.getElementById('tos-accept');
+  const downloaderMain = document.getElementById('downloader-main');
+
+  if (tosGate && tosCheckbox && tosAccept) {
+    if (localStorage.getItem('polarstools_tos_accepted') === 'true') {
+      tosGate.style.display = 'none';
+      if (downloaderMain) downloaderMain.style.display = 'block';
+    }
+    tosCheckbox.addEventListener('change', function () {
+      tosAccept.style.opacity = this.checked ? '1' : '0.5';
+      tosAccept.style.pointerEvents = this.checked ? 'auto' : 'none';
+    });
+    tosAccept.addEventListener('click', function () {
+      if (!tosCheckbox.checked) return;
+      localStorage.setItem('polarstools_tos_accepted', 'true');
+      tosGate.style.display = 'none';
+      if (downloaderMain) downloaderMain.style.display = 'block';
+    });
+  }
+
   const input = document.getElementById('level-input');
   const fetchBtn = document.getElementById('fetch-btn');
   const statusArea = document.getElementById('status-area');

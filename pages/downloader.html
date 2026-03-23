@@ -36,6 +36,26 @@
       <h1>Level Downloader</h1>
       <p class="page-subtitle">Download any GRAB level by pasting a link or identifier.</p>
       <div id="tool-content">
+        <div id="tos-gate" style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:24px;">
+          <h3 style="color:var(--text-heading);margin-bottom:12px;">Terms of Service</h3>
+          <div style="color:var(--text-muted);font-size:0.9rem;line-height:1.7;margin-bottom:16px;">
+            <p style="margin-bottom:8px;">By using the PolarsTools Level Downloader you agree to the following:</p>
+            <ul style="padding-left:20px;">
+              <li>All levels are the intellectual property of their original creators.</li>
+              <li>Downloaded levels are for <strong style="color:var(--text);">personal use only</strong>. Do not redistribute, re-upload, or claim others' work as your own.</li>
+              <li>PolarsTools is <strong style="color:var(--text);">not responsible</strong> for how you use downloaded content. Any consequences from misuse are solely your responsibility.</li>
+              <li>PolarsTools is not affiliated with, endorsed by, or associated with GRAB, Slin, or any official GRAB entity.</li>
+              <li>This tool accesses publicly available data. We do not store, modify, or cache any level files.</li>
+            </ul>
+          </div>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.9rem;color:var(--text);">
+            <input type="checkbox" id="tos-checkbox">
+            I have read and agree to the Terms of Service
+          </label>
+          <button class="btn btn-primary" id="tos-accept" style="margin-top:14px;opacity:0.5;pointer-events:none;">Accept &amp; Continue</button>
+        </div>
+
+        <div id="downloader-main" style="display:none;">
         <div class="downloader-input-row">
           <input type="text" id="level-input" placeholder="Paste GRAB level link or ID (e.g. grabvr.quest/levels/viewer?level=...)">
           <button class="btn btn-primary" id="fetch-btn">Download</button>
@@ -54,6 +74,7 @@
             <p class="preview-desc" id="preview-desc"></p>
             <button class="btn btn-primary" id="download-btn">Download .level</button>
           </div>
+        </div>
         </div>
       </div>
     </div>
