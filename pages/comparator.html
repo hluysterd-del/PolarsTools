@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Level Comparator — PolarsTools</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/protection.js"></script>
+  <style>
+    .upload-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 700px) { .upload-row { grid-template-columns: 1fr; } }
+
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+      background: var(--bg-card);
+    }
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(108, 92, 231, 0.06);
+    }
+    .upload-zone .upload-icon { font-size: 2rem; margin-bottom: 8px; }
+    .upload-zone h3 { color: var(--text-heading); font-size: 1rem; margin-bottom: 4px; }
+    .upload-zone p { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
+    .upload-zone input[type="file"] { display: none; }
+    .upload-zone.loaded { border-color: #2ecc71; border-style: solid; }
+    .upload-zone.loaded .upload-icon { opacity: 0.5; }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .compare-table th, .compare-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    .compare-table th {
+      background: rgba(108, 92, 231, 0.08);
+      color: var(--text-heading);
+      font-weight: 600;
+    }
+    .compare-table td { color: var(--text); }
+    .compare-table .diff-add { color: #2ecc71; font-weight: 600; }
+    .compare-table .diff-remove { color: #e74c3c; font-weight: 600; }
+    .compare-table .diff-same { color: var(--text-muted); }
+
+    .diff-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .diff-section h3 { color: var(--text-heading); font-size: 1.05rem; margin-bottom: 12px; }
+    .diff-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 700px) { .diff-cols { grid-template-columns: 1fr; } }
+    .diff-col h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; }
+    .diff-col h4.add { color: #2ecc71; }
+    .diff-col h4.remove { color: #e74c3c; }
+    .diff-col ul { list-style: none; }
+    .diff-col li { padding: 4px 0; font-size: 0.85rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <nav class="nav-bar">
+    <div class="container">
+      <a href="../index.html" class="nav-logo">PolarsTools</a>
+      <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle navigation">&#9776;</button>
+      <ul class="nav-links">
+        <li><a href="downloader.html">Downloader</a></li>
+        <li><a href="browser.html">Browser</a></li>
+        <li><a href="image2grab.html">Image2Grab</a></li>
+        <li><a href="colors.html">Colors</a></li>
+        <li><a href="stats.html">Stats</a></li>
+        <li><a href="userlookup.html">User Lookup</a></li>
+        <li><a href="editor.html">Editor</a></li>
+        <li><a href="merger.html">Merger</a></li>
+        <li><a href="generator.html">Generator</a></li>
+        <li><a href="preview3d.html">3D Preview</a></li>
+        <li><a href="converter.html">Converter</a></li>
+        <li><a href="randomizer.html">Randomizer</a></li>
+        <li><a href="complexity.html">Complexity</a></li>
+        <li><a href="comparator.html" class="active">Comparator</a></li>
+        <li><a href="inspector.html">Inspector</a></li>
+        <li><a href="materials.html">Material Counter</a></li>
+        <li><a href="nodetree.html">Node Tree</a></li>
+        <li><a href="cloner.html">Cloner</a></li>
+        <li><a href="checkpoints.html">Checkpoints</a></li>
+        <li><a href="gravity.html">Gravity Sim</a></li>
+        <li><a href="timeline.html">Animation Timeline</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <div class="container">
+      <h1>Level Comparator</h1>
+      <p class="page-subtitle">Compare two GRAB levels side by side to find differences.</p>
+
+      <div id="tool-content">
+        <div class="upload-row">
+          <div class="upload-zone" id="upload-a">
+            <div class="upload-icon">&#127312;</div>
+            <h3>Level A</h3>
+            <p>Drop or click to upload</p>
+            <input type="file" id="file-a" accept=".level">
+          </div>
+          <div class="upload-zone" id="upload-b">
+            <div class="upload-icon">&#127313;</div>
+            <h3>Level B</h3>
+            <p>Drop or click to upload</p>
+            <input type="file" id="file-b" accept=".level">
+          </div>
+        </div>
+
+        <div class="status-area" id="status-area" style="display:none;"></div>
+
+        <div id="results" style="display:none;">
+          <table class="compare-table" id="compare-table">
+            <thead>
+              <tr><th>Property</th><th>Level A</th><th>Level B</th></tr>
+            </thead>
+            <tbody id="compare-body"></tbody>
+          </table>
+
+          <div class="diff-section">
+            <h3>Material Differences</h3>
+            <div class="diff-cols">
+              <div class="diff-col">
+                <h4 class="add">Only in Level A</h4>
+                <ul id="diff-a-materials"></ul>
+              </div>
+              <div class="diff-col">
+                <h4 class="remove">Only in Level B</h4>
+                <ul id="diff-b-materials"></ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="diff-section">
+            <h3>Shape Differences</h3>
+            <div class="diff-cols">
+              <div class="diff-col">
+                <h4 class="add">Only in Level A</h4>
+                <ul id="diff-a-shapes"></ul>
+              </div>
+              <div class="diff-col">
+                <h4 class="remove">Only in Level B</h4>
+                <ul id="diff-b-shapes"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">PolarsTools &mdash; Not affiliated with GRAB or Slin</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/protobufjs@7/dist/protobuf.min.js"></script>
+  <script src="../js/proto.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/comparator.js"></script>
+  <script src="../js/chatbot.js"></script>
+</body>
+</html>

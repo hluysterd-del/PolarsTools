@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Level Randomizer — PolarsTools</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/protection.js"></script>
+  <style>
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 48px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+      background: var(--bg-card);
+      margin-bottom: 24px;
+    }
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(108, 92, 231, 0.06);
+    }
+    .upload-zone .upload-icon { font-size: 2.5rem; margin-bottom: 8px; }
+    .upload-zone p { color: var(--text-muted); font-size: 0.95rem; margin-top: 8px; }
+    .upload-zone input[type="file"] { display: none; }
+
+    .options-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .options-card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-heading);
+      margin-bottom: 16px;
+    }
+    .option-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .option-row label {
+      color: var(--text);
+      font-size: 0.92rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      min-width: 200px;
+    }
+    .option-row input[type="checkbox"] { accent-color: var(--accent); width: 18px; height: 18px; }
+    .option-row input[type="range"] { flex: 1; accent-color: var(--accent); }
+    .option-row .range-val {
+      color: var(--cyan);
+      font-weight: 600;
+      font-size: 0.9rem;
+      min-width: 50px;
+      text-align: right;
+    }
+    .actions { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+    .actions .btn { min-width: 160px; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <nav class="nav-bar">
+    <div class="container">
+      <a href="../index.html" class="nav-logo">PolarsTools</a>
+      <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle navigation">&#9776;</button>
+      <ul class="nav-links">
+        <li><a href="downloader.html">Downloader</a></li>
+        <li><a href="browser.html">Browser</a></li>
+        <li><a href="image2grab.html">Image2Grab</a></li>
+        <li><a href="colors.html">Colors</a></li>
+        <li><a href="stats.html">Stats</a></li>
+        <li><a href="userlookup.html">User Lookup</a></li>
+        <li><a href="editor.html">Editor</a></li>
+        <li><a href="merger.html">Merger</a></li>
+        <li><a href="generator.html">Generator</a></li>
+        <li><a href="preview3d.html">3D Preview</a></li>
+        <li><a href="converter.html">Converter</a></li>
+        <li><a href="randomizer.html" class="active">Randomizer</a></li>
+        <li><a href="complexity.html">Complexity</a></li>
+        <li><a href="comparator.html">Comparator</a></li>
+        <li><a href="inspector.html">Inspector</a></li>
+        <li><a href="materials.html">Material Counter</a></li>
+        <li><a href="nodetree.html">Node Tree</a></li>
+        <li><a href="cloner.html">Cloner</a></li>
+        <li><a href="checkpoints.html">Checkpoints</a></li>
+        <li><a href="gravity.html">Gravity Sim</a></li>
+        <li><a href="timeline.html">Animation Timeline</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <div class="container">
+      <h1>Level Randomizer</h1>
+      <p class="page-subtitle">Upload a .level file and randomize its properties for fun variations.</p>
+
+      <div id="tool-content">
+        <div class="upload-zone" id="upload-zone">
+          <div class="upload-icon">&#127922;</div>
+          <strong>Drop a .level file here or click to upload</strong>
+          <p>Select a GRAB level file to randomize.</p>
+          <input type="file" id="file-input" accept=".level">
+        </div>
+
+        <div class="options-card" id="options-card" style="display:none;">
+          <h3>Randomization Options</h3>
+
+          <div class="option-row">
+            <label><input type="checkbox" id="opt-colors" checked> Randomize Colors</label>
+          </div>
+
+          <div class="option-row">
+            <label><input type="checkbox" id="opt-positions" checked> Randomize Positions</label>
+            <input type="range" id="pos-range" min="1" max="50" value="10">
+            <span class="range-val" id="pos-range-val">10</span>
+          </div>
+
+          <div class="option-row">
+            <label><input type="checkbox" id="opt-materials"> Randomize Materials</label>
+          </div>
+
+          <div class="option-row">
+            <label><input type="checkbox" id="opt-scale"> Randomize Scale</label>
+            <input type="range" id="scale-range" min="10" max="300" value="100">
+            <span class="range-val" id="scale-range-val">100%</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="randomize-btn" disabled>Randomize!</button>
+          <button class="btn btn-secondary" id="download-btn" disabled style="display:none;">Download Randomized .level</button>
+        </div>
+
+        <div class="status-area" id="status-area" style="display:none;"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">PolarsTools &mdash; Not affiliated with GRAB or Slin</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/protobufjs@7/dist/protobuf.min.js"></script>
+  <script src="../js/proto.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/randomizer.js"></script>
+  <script src="../js/chatbot.js"></script>
+</body>
+</html>

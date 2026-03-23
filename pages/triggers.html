@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trigger Debugger — PolarsTools</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/protection.js"></script>
+  <style>
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 48px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+      background: var(--bg-card);
+      margin-bottom: 24px;
+    }
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(108, 92, 231, 0.06);
+    }
+    .upload-zone .upload-icon { font-size: 2.5rem; margin-bottom: 8px; }
+    .upload-zone p { color: var(--text-muted); font-size: 0.95rem; margin-top: 8px; }
+    .upload-zone input[type="file"] { display: none; }
+
+    .trigger-list { margin-bottom: 24px; }
+    .trigger-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 12px;
+    }
+    .trigger-card h3 {
+      color: var(--cyan);
+      font-size: 1rem;
+      margin-bottom: 8px;
+    }
+    .trigger-card .detail {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      margin-bottom: 4px;
+    }
+    .trigger-card .detail strong { color: var(--text); }
+    #trigger-canvas {
+      width: 100%;
+      max-width: 700px;
+      height: 500px;
+      background: #0d0d1a;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: block;
+      margin: 0 auto 24px;
+    }
+    .canvas-section h3 {
+      color: var(--text-heading);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav-bar">
+    <div class="container">
+      <a href="../index.html" class="nav-logo">PolarsTools</a>
+      <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle navigation">&#9776;</button>
+      <ul class="nav-links">
+        <li><a href="downloader.html">Downloader</a></li>
+        <li><a href="browser.html">Browser</a></li>
+        <li><a href="image2grab.html">Image2Grab</a></li>
+        <li><a href="colors.html">Colors</a></li>
+        <li><a href="stats.html">Stats</a></li>
+        <li><a href="userlookup.html">User Lookup</a></li>
+        <li><a href="editor.html">Editor</a></li>
+        <li><a href="merger.html">Merger</a></li>
+        <li><a href="generator.html">Generator</a></li>
+        <li><a href="preview3d.html">3D Preview</a></li>
+        <li><a href="converter.html">Converter</a></li>
+        <li><a href="randomizer.html">Randomizer</a></li>
+        <li><a href="complexity.html">Complexity</a></li>
+        <li><a href="comparator.html">Comparator</a></li>
+        <li><a href="inspector.html">Inspector</a></li>
+        <li><a href="materials.html">Material Counter</a></li>
+        <li><a href="nodetree.html">Node Tree</a></li>
+        <li><a href="cloner.html">Cloner</a></li>
+        <li><a href="checkpoints.html">Checkpoints</a></li>
+        <li><a href="gravity.html">Gravity Sim</a></li>
+        <li><a href="timeline.html">Animation Timeline</a></li>
+        <li><a href="triggers.html" class="active">Trigger Debug</a></li>
+        <li><a href="sounds.html">Sound Designer</a></li>
+        <li><a href="templates.html">Templates</a></li>
+        <li><a href="batch.html">Batch Download</a></li>
+        <li><a href="diff.html">Level Diff</a></li>
+        <li><a href="tags.html">Tag Manager</a></li>
+        <li><a href="speedrun.html">Speedrun</a></li>
+        <li><a href="leaderboard.html">Leaderboard</a></li>
+        <li><a href="sharing.html">Sharing</a></li>
+        <li><a href="updates.html">Updates</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <div class="container">
+      <h1>Trigger Debugger</h1>
+      <p class="page-subtitle">Upload a .level file to inspect all trigger nodes, their sources, targets, and zones.</p>
+
+      <div id="tool-content">
+        <div class="upload-zone" id="upload-zone">
+          <div class="upload-icon">&#128270;</div>
+          <strong>Drop a .level file here or click to upload</strong>
+          <p>Select a GRAB level file to analyze triggers.</p>
+          <input type="file" id="file-input" accept=".level">
+        </div>
+
+        <div class="status-area" id="status-area" style="display:none;"></div>
+
+        <div id="results" style="display:none;">
+          <div class="trigger-list" id="trigger-list"></div>
+          <div class="canvas-section">
+            <h3>Top-Down Trigger Zone View</h3>
+            <canvas id="trigger-canvas" width="700" height="500"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">PolarsTools &mdash; Not affiliated with GRAB or Slin</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/protobufjs@7/dist/protobuf.min.js"></script>
+  <script src="../js/proto.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/triggers.js"></script>
+  <script src="../js/chatbot.js"></script>
+</body>
+</html>
